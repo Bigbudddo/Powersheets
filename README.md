@@ -7,7 +7,7 @@ This will only work with the following Spreadsheet File extensions currently:
 * XLSX
 
 ## Getting Started
-To get started, simply clone/download the repo to your local machine and open with Visual Studio. Ensure that you Clean and then Build the Solution, which will output the DLLs required into the bin folder. Copy the three required DLLs into your poject and reference them accordingly.
+To get started, simply clone/download the repo to your local machine and open with Visual Studio. Ensure that you Clean and then Build the Solution, which will output the DLLs required into the bin folder. Copy the three required DLLs into your project and reference them accordingly.
 
 > * Excel.dll
 > * ICSharpCode.SharpZipLib.dll
