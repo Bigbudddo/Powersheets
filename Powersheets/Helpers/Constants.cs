@@ -196,10 +196,42 @@ namespace Powersheets {
             return indexes.ToArray();
         }
 
-        // TODO: Work on me when you get to the formula part!
         internal static int ColumnIndexOf(this DataRow row, string heading) {
             if (heading.IsFormula()) {
-                // TODO: Work on me when you get to the formula part!
+                if (heading.IsHeadingFormula()) {
+                    string subType = heading.ExtractFormulaSubType();
+                    string value = heading.ExtractFormulaValue();
+
+                    value = value.ToLower().Trim();
+                    for (int i = 0; i < row.ItemArray.Count(); i++) {
+                        object obj = row.ItemArray[i];
+                        try {
+                            string objString = obj.ToString().ToLower().Trim();
+                            switch (subType) {
+                                case "LIKE":
+                                    int computeLength;
+                                    string cast = heading.ExtractFormulaCastType();
+                                    if (int.TryParse(cast, out computeLength)) {
+                                        int compute = value.LevenshteinCompute(objString);
+                                        if (compute <= computeLength) {
+                                            return i;
+                                        }
+                                    }
+                                    break;
+                                case "EQUALS":
+                                    if (value == objString) {
+                                        return i;
+                                    }
+                                    break;
+                                default:
+                                    continue;
+                            }
+                        }
+                        catch {
+                            continue;
+                        }
+                    }
+                }
             }
             else {
                 heading = heading.ToLower().Trim();
