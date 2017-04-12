@@ -43,6 +43,9 @@ namespace Powersheets.Console {
                     case "8":
                         RunImport<MovieBase>(0);
                         break;
+                    case "9":
+                        RunGrid<MovieBase>(0);
+                        break;
                     case "Q":
                     case "EXIT":
                     case "QUIT":
@@ -54,6 +57,25 @@ namespace Powersheets.Console {
                 System.Console.WriteLine("-----------------");
                 System.Console.ReadKey();
             } while (_run);
+        }
+
+        static void RunGrid<T>(int tableId) where T : class {
+            try {
+                IPowersheetImporter<T> importer = PowersheetImportFactory.Get<T>(@"Files/sheet.xlsx");
+                object[,] grid = importer.ToGrid(tableId);
+
+                int y = (grid.GetLength(0) < 10) ? grid.GetLength(0) : 10;
+                int x = (grid.GetLength(1) < 10) ? grid.GetLength(1) : 10;
+
+                for (int o = 0; o < y; o++) {
+                    for (int i = 0; i < x; i++) {
+                        System.Console.Write(grid[o, i]);
+                    }
+                }
+            }
+            catch (Exception ex) {
+                System.Console.WriteLine("Oops! {0}", ex.Message);
+            }
         }
 
         static void RunImport<T>(int tableId) where T : class {
@@ -77,10 +99,6 @@ namespace Powersheets.Console {
 
                 IPowersheetPropertyMap[] mappings = importer.GetMappings(columns).ToArray();
                 List<T> data = importer.Fetch(tableId, headingsRow, null, null, mappings).ToList();
-
-                //var importer = new PowersheetImporter<T>(@"Files/sheet.xlsx");
-                //IEnumerable<IPowersheetPropertyMap> mappings = importer.GetPropertyMappings(columns);
-                //List<T> data = importer.GetAll(tableId, headingsRow, mappings.ToArray()).ToList();
 
                 foreach (var d in data) {
                     System.Console.WriteLine(d.ToString());
