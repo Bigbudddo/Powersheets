@@ -30,9 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Excel">
-      <HintPath>..\..\_Libraries\Excel.dll</HintPath>
-    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\..\_Libraries\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
@@ -50,6 +47,69 @@
     <Compile Include="Attributes\SpreadsheetColumn.cs" />
     <Compile Include="Factories\PowersheetExportFactory.cs" />
     <Compile Include="Factories\PowersheetImportFactory.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\Enums.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\IXlsString.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsBiffBlankCell.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsBiffBOF.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsBiffBoundSheet.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsBiffContinue.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsBiffDbCell.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsBiffDimensions.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsBiffEOF.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsBiffFormatString.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsBiffFormulaCell.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsBiffFormulaString.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsBiffIndex.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsBiffIntegerCell.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsBiffInterfaceHdr.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsBiffLabelCell.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsBiffLabelSSTCell.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsBiffMSODrawing.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsBiffMulBlankCell.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsBiffMulRKCell.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsBiffNumberCell.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsBiffQuickTip.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsBiffRecord.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsBiffRKCell.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsBiffRow.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsBiffSimpleValueRecord.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsBiffSST.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsBiffStream.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsBiffUncalced.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsBiffWindow1.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsByteString.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsDirectoryEntry.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsFat.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsFormattedUnicodeString.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsHeader.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsRootDirectory.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsStream.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsStringFactory.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsWorkbookGlobals.cs" />
+    <Compile Include="Framework\Core\BinaryFormat\XlsWorksheet.cs" />
+    <Compile Include="Framework\Core\FormatReader.cs" />
+    <Compile Include="Framework\Core\Helpers.cs" />
+    <Compile Include="Framework\Core\OpenXmlFormat\XlsxDimension.cs" />
+    <Compile Include="Framework\Core\OpenXmlFormat\XlsxNumFmt.cs" />
+    <Compile Include="Framework\Core\OpenXmlFormat\XlsxSST.cs" />
+    <Compile Include="Framework\Core\OpenXmlFormat\XlsxStyles.cs" />
+    <Compile Include="Framework\Core\OpenXmlFormat\XlsxWorkbook.cs" />
+    <Compile Include="Framework\Core\OpenXmlFormat\XlsxWorksheet.cs" />
+    <Compile Include="Framework\Core\OpenXmlFormat\XlsxXf.cs" />
+    <Compile Include="Framework\Core\OpenXmlFormat\XmlReaderExtensions.cs" />
+    <Compile Include="Framework\Core\ReferenceHelper.cs" />
+    <Compile Include="Framework\Core\ZipWorker.cs" />
+    <Compile Include="Framework\Errors.cs" />
+    <Compile Include="Framework\ExcelBinaryReader.cs" />
+    <Compile Include="Framework\ExcelOpenXmlReader.cs" />
+    <Compile Include="Framework\ExcelReaderFactory.cs" />
+    <Compile Include="Framework\Exceptions\BiffRecordException.cs" />
+    <Compile Include="Framework\Exceptions\HeaderException.cs" />
+    <Compile Include="Framework\IExcelDataReader.cs" />
+    <Compile Include="Framework\Log\ILog.cs" />
+    <Compile Include="Framework\Log\Log.cs" />
+    <Compile Include="Framework\Log\Logger\NullLog.cs" />
+    <Compile Include="Framework\Log\LogManager.cs" />
     <Compile Include="Interfaces\IPowersheetExporter.cs" />
     <Compile Include="Interfaces\IPowersheetImporter.cs" />
     <Compile Include="Interfaces\IPowersheetPropertyMap.cs" />
