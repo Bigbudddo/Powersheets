@@ -130,7 +130,6 @@
     <Compile Include="Models\Formula\ValueFormula.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Libraries\Excel.dll" />
     <Content Include="Libraries\ICSharpCode.SharpZipLib.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
