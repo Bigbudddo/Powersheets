@@ -38,6 +38,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -48,7 +49,9 @@
     <Compile Include="Attributes\SpreadsheetAutoIncrement.cs" />
     <Compile Include="Attributes\SpreadsheetColumn.cs" />
     <Compile Include="Factories\PowersheetExportFactory.cs" />
+    <Compile Include="Factories\PowersheetImportFactory.cs" />
     <Compile Include="Interfaces\IPowersheetExporter.cs" />
+    <Compile Include="Interfaces\IPowersheetImporter.cs" />
     <Compile Include="Interfaces\IPowersheetPropertyMap.cs" />
     <Compile Include="Models\Formula\CastFormula.cs" />
     <Compile Include="Factories\PowersheetFormulaFactory.cs" />
@@ -59,7 +62,7 @@
     <Compile Include="Models\Formula\MathFormula.cs" />
     <Compile Include="Models\Formula\PowersheetFormula.cs" />
     <Compile Include="Models\Formula\ResultFormula.cs" />
-    <Compile Include="Models\Importer\PowersheetImporter.cs" />
+    <Compile Include="Models\Importer\SpreadsheetImporter.cs" />
     <Compile Include="Models\PowersheetPropertyMap.cs" />
     <Compile Include="Models\Exporter\XLSExporter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
