@@ -97,8 +97,11 @@ namespace Powersheets {
                 if (p != null) {
                     object value;
                     if (p.PropertyType == typeof(string)) {
-                        string vString = p.GetValue(newObj, null).ToString().Trim();
-                        value = (String.IsNullOrWhiteSpace(vString)) ? null : vString;
+                        value = p.GetValue(newObj, null);
+                        if (value != null) {
+                            string vString = p.GetValue(newObj, null).ToString().Trim();
+                            value = (String.IsNullOrWhiteSpace(vString)) ? null : vString;
+                        }
                     }
                     else {
                         value = p.GetValue(newObj, null);
