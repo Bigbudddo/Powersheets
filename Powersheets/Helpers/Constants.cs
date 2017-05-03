@@ -196,6 +196,21 @@ namespace Powersheets {
             return indexes.ToArray();
         }
 
+        internal static int LargestIndexOf(this IEnumerable<IPowersheetExporterDump> values) {
+            int longest = 0;
+            int longestIndex = 0;
+
+            for (int i = 0; i < values.Count(); i++) {
+                IPowersheetExporterDump x = values.ToArray()[i];
+                if (x.Columns.Count() >= longest) {
+                    longest = x.Columns.Count();
+                    longestIndex = i;
+                }
+            }
+
+            return longestIndex;
+        }
+
         internal static int ColumnIndexOf(this DataRow row, string heading) {
             if (heading.IsFormula()) {
                 if (heading.IsHeadingFormula()) {

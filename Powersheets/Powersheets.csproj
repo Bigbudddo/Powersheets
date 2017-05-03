@@ -111,8 +111,10 @@
     <Compile Include="Framework\Log\Logger\NullLog.cs" />
     <Compile Include="Framework\Log\LogManager.cs" />
     <Compile Include="Interfaces\IPowersheetExporter.cs" />
+    <Compile Include="Interfaces\IPowersheetExporterDump.cs" />
     <Compile Include="Interfaces\IPowersheetImporter.cs" />
     <Compile Include="Interfaces\IPowersheetPropertyMap.cs" />
+    <Compile Include="Models\Exporter\Exporter.cs" />
     <Compile Include="Models\Formula\CastFormula.cs" />
     <Compile Include="Factories\PowersheetFormulaFactory.cs" />
     <Compile Include="Helpers\Constants.cs" />

@@ -17,7 +17,8 @@ namespace Powersheets {
                 case ExportType.CSV:
                     return new CSVExporter();
                 case ExportType.XLS:
-                    return new XLSExporter();
+                    throw new Exception("XLS Disabled");
+                    //return new XLSExporter();
                 default:
                     return null;
             }

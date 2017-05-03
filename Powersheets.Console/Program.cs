@@ -109,5 +109,29 @@ namespace Powersheets.Console {
                 System.Console.WriteLine("Oops! {0}", ex.Message);
             }
         }
+
+        static void RunDump<T>(int tableId) {
+            try {
+                IPowersheetImporter<T> importer = PowersheetImportFactory.Get<T>(@"Files/sheet.xlsx");
+                List<T> data = importer.GetAll(tableId).ToList();
+
+                var dumpStuff = new List<DumpClass>();
+                foreach (var d in data) {
+                    var c = new DumpClass();
+                }
+            }
+            catch (Exception ex) {
+                System.Console.WriteLine("Oops! {0}", ex.Message);
+            }
+        }
+    }
+
+    class DumpClass : IPowersheetExporterDump {
+
+        public Dictionary<string, string> Columns { get; set; }
+
+        public DumpClass() {
+            Columns = new Dictionary<string, string>();
+        }
     }
 }

@@ -6,7 +6,19 @@ using System.Threading.Tasks;
 
 namespace Powersheets {
     
-    internal sealed class XLSExporter : IPowersheetExporter {
+    // TODO: Fix this to work with how the CSV work and DUMP'ing
+    internal sealed class XLSExporter : Exporter, IPowersheetExporter {
+
+        public StringBuilder Dump(IEnumerable<IPowersheetExporterDump> dataSet, bool writeHeadings) {
+            var rowData = new StringBuilder();
+            var colData = new StringBuilder();
+
+            if (dataSet == null || dataSet.Count() <= 0) {
+                return new StringBuilder();
+            }
+
+            throw new NotImplementedException();
+        }
 
         public StringBuilder Export(IEnumerable<object> dataSet, IEnumerable<string> columns, bool writeHeadings, bool writeAutoIncrement) {
             var rowData = new StringBuilder();
@@ -80,6 +92,17 @@ namespace Powersheets {
                 </Worksheet>", dateHer, columnCollection.Count() + 1, dataSet.Count() + 1, colData, rowData
             ));
             return retval;
+        }
+
+        public StringBuilder Export(IEnumerable<object> dataSet, bool writeHeadings, bool writeAutoIncrement) {
+            if (dataSet == null || dataSet.Count() <= 0) {
+                return new StringBuilder();
+            }
+
+            object dataObj = dataSet.First();
+            IEnumerable<string> columns = FetchObjectProperties(dataObj.GetType(), null);
+
+            return Export(dataSet, columns, writeHeadings, writeAutoIncrement);
         }
     }
 }
