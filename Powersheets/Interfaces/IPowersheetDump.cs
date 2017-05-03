@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Powersheets {
 
-    public interface IPowersheetExporterDump {
+    public interface IPowersheetDump {
 
         Dictionary<string, string> Columns { get; set; }
     }

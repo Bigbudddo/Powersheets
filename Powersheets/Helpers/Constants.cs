@@ -11,6 +11,16 @@ namespace Powersheets {
 
     internal static class Constants {
 
+        internal static bool HasProperty(this Type type, string propertyName) {
+            try {
+                PropertyInfo info = type.GetProperty(propertyName);
+                return (info != null);
+            }
+            catch {
+                return false;
+            }
+        }
+
         internal static bool IsFormula(this string value) {
             if (!String.IsNullOrWhiteSpace(value)) {
                 return (value[0] == '=') ? true : false;
@@ -196,12 +206,12 @@ namespace Powersheets {
             return indexes.ToArray();
         }
 
-        internal static int LargestIndexOf(this IEnumerable<IPowersheetExporterDump> values) {
+        internal static int LargestIndexOf(this IEnumerable<IPowersheetDump> values) {
             int longest = 0;
             int longestIndex = 0;
 
             for (int i = 0; i < values.Count(); i++) {
-                IPowersheetExporterDump x = values.ToArray()[i];
+                IPowersheetDump x = values.ToArray()[i];
                 if (x.Columns.Count() >= longest) {
                     longest = x.Columns.Count();
                     longestIndex = i;

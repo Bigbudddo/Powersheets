@@ -8,9 +8,9 @@ namespace Powersheets {
     
     public interface IPowersheetExporter {
 
-        StringBuilder Dump(IEnumerable<IPowersheetExporterDump> dataSet, bool writeHeadings, bool writeAutoIncrement);
+        StringBuilder Dump(IEnumerable<IPowersheetDump> dataSet, bool writeHeadings, bool writeAutoIncrement);
 
-        StringBuilder Dump(IEnumerable<IPowersheetExporterDump> dataSet, IEnumerable<string> propertyColumns, bool writeHeadings, bool writeAutoIncrement);
+        StringBuilder Dump(IEnumerable<IPowersheetDump> dataSet, IEnumerable<string> propertyColumns, bool writeHeadings, bool writeAutoIncrement);
 
         StringBuilder Export(IEnumerable<object> dataSet, bool writeHeadings, bool writeAutoIncrement);
 

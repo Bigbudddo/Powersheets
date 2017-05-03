@@ -8,7 +8,18 @@ namespace Powersheets {
     
     internal sealed class CSVExporter : Exporter, IPowersheetExporter {
 
-        public StringBuilder Dump(IEnumerable<IPowersheetExporterDump> dataSet, bool writeHeadings, bool writeAutoIncrement) {
+        public StringBuilder Dump(IEnumerable<IPowersheetDump> dataSet, bool writeHeadings, bool writeAutoIncrement) {
+            if (dataSet == null || dataSet.Count() <= 0) {
+                return new StringBuilder();
+            }
+
+            object dataObj = dataSet.First();
+            IEnumerable<string> columns = FetchObjectProperties(dataObj.GetType(), null);
+
+            return Dump(dataSet, columns, writeHeadings, writeAutoIncrement);
+        }
+
+        public StringBuilder Dump(IEnumerable<IPowersheetDump> dataSet, IEnumerable<string> propertyColumns, bool writeHeadings, bool writeAutoIncrement) {
             var builder = new StringBuilder();
             var rowBuilder = new StringBuilder();
 
@@ -16,40 +27,79 @@ namespace Powersheets {
                 return builder;
             }
 
-            // Fetch the index of the longest dump collection..
-            int longestIndex = dataSet.LargestIndexOf();
+            var columns = new List<string>();
+            // Fetch the Auto-Increment Column if we need it/can get it
+            var type = dataSet.First().GetType();
+            var clsAttribute = Attribute.GetCustomAttribute(type, typeof(SpreadsheetAutoIncrement)) as SpreadsheetAutoIncrement;
+            if (clsAttribute != null && writeAutoIncrement) {
+                columns.Add(clsAttribute.PropertyName);
+            }
 
+            // Fetch the list of extra columns
+            int longestIndex = dataSet.LargestIndexOf(); // Fetch the index out of the data
             List<string> probableHeadings = dataSet.ToArray()[longestIndex].Columns.Keys.ToList();
-            if (writeHeadings) {
-                for (int i = 0; i < probableHeadings.Count; i++) {
-                    rowBuilder.Append(String.Format("\"{0}\"", probableHeadings[i]));
+            // Do we need to fetch any additional columns, such as actual properties?
+            if (propertyColumns != null && propertyColumns.Count() > 0) {
+                columns.AddRange(propertyColumns);
+            }
 
-                    if (i < probableHeadings.Count() - 1) {
+            // Check if we are writing headings out
+            if (writeHeadings) {
+                for (int i = 0; i < columns.Count; i++) {
+                    rowBuilder.Append(String.Format("\"{0}\"", columns[i]));
+
+                    if (i < (columns.Count() - 1)) {
                         rowBuilder.Append(",");
                     }
                 }
+
+                if (probableHeadings.Count() > 0 && rowBuilder.Length > 0) {
+                    rowBuilder.Append(",");
+                }
+
+                for (int i = 0; i < probableHeadings.Count; i++) {
+                    rowBuilder.Append(String.Format("\"{0}\"", probableHeadings[i]));
+
+                    if (i < (probableHeadings.Count() - 1)) {
+                        rowBuilder.Append(",");
+                    }
+                }
+
                 builder.AppendLine(rowBuilder.ToString());
             }
 
             foreach (var row in dataSet) {
                 rowBuilder.Clear();
-                Dictionary<string, string> columns = row.Columns;
                 for (int i = 0; i < columns.Count; i++) {
-                    string value = columns.ElementAt(i).Value;
+                    var propValue = row.GetType().GetProperty(columns[i]).GetValue(row, null);
+                    string value = propValue.ToString();
+
                     rowBuilder.Append(String.Format("\"{0}\"", value));
 
-                    if (i < columns.Count() - 1) {
+                    if (i < (columns.Count() - 1)) {
                         rowBuilder.Append(",");
+                    } 
+                }
+
+                Dictionary<string, string> c = row.Columns;
+                if (c.Count() > 0 && rowBuilder.Length > 0) {
+                    rowBuilder.Append(",");
+                }
+                if (c.Count() > 0) {
+                    for (int i = 0; i < c.Count; i++) {
+                        string value = c.ElementAt(i).Value;
+                        rowBuilder.Append(String.Format("\"{0}\"", value));
+
+                        if (i < (c.Count() - 1)) {
+                            rowBuilder.Append(",");
+                        }
                     }
                 }
+
                 builder.AppendLine(rowBuilder.ToString());
             }
 
             return builder;
-        }
-
-        public StringBuilder Dump(IEnumerable<IPowersheetExporterDump> dataSet, IEnumerable<string> propertyColumns, bool writeHeadings, bool writeAutoIncrement) {
-            throw new NotImplementedException();
         }
 
         public StringBuilder Export(IEnumerable<object> dataSet, bool writeHeadings, bool writeAutoIncrement) {

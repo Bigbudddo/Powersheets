@@ -25,6 +25,8 @@ namespace Powersheets {
 
         IEnumerable<T> Fetch(int tableId, int? headingsRowIndex, int? start, int? limit, params IPowersheetPropertyMap[] selectedColumns);
 
+        IEnumerable<IPowersheetDump> Extract(int tableId, int headingsRowIndex, params string[] ignoreColumns);
+
         object[,] ToGrid(int tableId);
     }
 }

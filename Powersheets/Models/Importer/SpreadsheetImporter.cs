@@ -55,15 +55,79 @@ namespace Powersheets {
         }
 
         public IEnumerable<T> GetAll(int tableId) {
-            return Extract(tableId, null, null, null, null);
+            return Retrieve(tableId, null, null, null, null);
         }
 
         public IEnumerable<T> GetAll(int tableId, int headingsRowIndex) {
-            return Extract(tableId, headingsRowIndex, null, null, null);
+            return Retrieve(tableId, headingsRowIndex, null, null, null);
         }
 
         public IEnumerable<T> Fetch(int tableId, int? headingsRowIndex, int? start, int? limit, params IPowersheetPropertyMap[] selectedColumns) {
-            return Extract(tableId, headingsRowIndex, start, limit, selectedColumns);
+            return Retrieve(tableId, headingsRowIndex, start, limit, selectedColumns);
+        }
+
+        public IEnumerable<IPowersheetDump> Extract(int tableId, int headingsRowIndex, params string[] ignoreColumns) {
+            // There may be a better way to execute this method, but get it working!
+            if (tableId >= _data.Tables.Count) {
+                throw new Exception("Table index is out with the range of the data set");
+            }
+
+            if (headingsRowIndex >= _data.Tables[tableId].Rows.Count || ((headingsRowIndex + 1) >= _data.Tables[tableId].Rows.Count)) {
+                throw new Exception("Headings Row specified is out with the range of the data set");
+            }
+
+            DataTable currentTable = _data.Tables[tableId];
+            var headingsRow = new Dictionary<int, string>();
+
+            // Get headings row data
+            object[] headingsObjRow = currentTable.Rows[headingsRowIndex].ItemArray;
+            for (int i = 0; i < headingsObjRow.Count(); i++) {
+                object v = headingsObjRow[i];
+                try {
+                    string vString = v.ToString();
+                    if (!ignoreColumns.Contains(vString)) {
+                        headingsRow.Add(i, vString);
+                    }
+                }
+                catch {
+                    continue;
+                }
+            }
+
+            var retval = new List<IPowersheetDump>();
+            for (int i = (headingsRowIndex + 1); i < currentTable.Rows.Count; i++) {
+                T newObj = (T)Activator.CreateInstance(typeof(T));
+
+                var cols = new Dictionary<string, string>();
+                object[] rowData = currentTable.Rows[i].ItemArray;
+
+                foreach (var pair in headingsRow) {
+                    // Find out if the key is within rowdata, and ALSO if the property exists, if not; then put it in cols
+                    if (pair.Key < rowData.Length) {
+                        if (typeof(T).HasProperty(pair.Value)) {
+
+                        }
+                        else {
+
+                        }
+                    }
+
+
+                    if (pair.Key < rowData.Length) {
+                        object rowObject = rowData[pair.Key];
+                        if (rowObject != null) {
+                            try {
+                                string rowString = rowObject.ToString();
+                            }
+                            catch {
+                                continue;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return retval;
         }
 
         public object[,] ToGrid(int tableId) {
@@ -137,7 +201,7 @@ namespace Powersheets {
             return -1;
         }
  
-        private IEnumerable<T> Extract(int tableId, int? headingsRowIndex, int? start, int? limit, params IPowersheetPropertyMap[] selectedColumns) {
+        private IEnumerable<T> Retrieve(int tableId, int? headingsRowIndex, int? start, int? limit, params IPowersheetPropertyMap[] selectedColumns) {
             // Validate our table index
             if (tableId >= _data.Tables.Count) {
                 throw new Exception("Table index is out with the range of the data set");

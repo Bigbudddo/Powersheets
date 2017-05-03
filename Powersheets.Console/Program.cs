@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,6 +20,9 @@ namespace Powersheets.Console {
                 System.Console.WriteLine("-----------------");
 
                 switch (input.ToUpper()) {
+                    case "-1":
+                        TestDump();
+                        break;
                     case "1":
                         RunImport<MovieBase>(0, 0, null);
                         break;
@@ -124,9 +128,28 @@ namespace Powersheets.Console {
                 System.Console.WriteLine("Oops! {0}", ex.Message);
             }
         }
+
+        /// <summary>
+        /// Simply for testing...
+        /// </summary>
+        static void TestDump() {
+            IPowersheetImporter<Movie> importer = PowersheetImportFactory.Get<Movie>(@"Files/sheet.xlsx");
+            List<Movie> data = importer.GetAll(0).ToList();
+
+            foreach (var d in data) {
+                d.Columns.Add("test", "this is dumped!");
+            }
+
+            IPowersheetExporter exporter = PowersheetExportFactory.Get();
+            StringBuilder dump = exporter.Dump(data, true, false);
+
+            using (StreamWriter writer = new StreamWriter(@"dump.csv")) {
+                writer.WriteLine(dump.ToString());
+            }
+        }
     }
 
-    class DumpClass : IPowersheetExporterDump {
+    class DumpClass : IPowersheetDump {
 
         public Dictionary<string, string> Columns { get; set; }
 
