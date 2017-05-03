@@ -8,7 +8,7 @@ namespace Powersheets {
     
     internal sealed class CSVExporter : Exporter, IPowersheetExporter {
 
-        public StringBuilder Dump(IEnumerable<IPowersheetExporterDump> dataSet, bool writeHeadings) {
+        public StringBuilder Dump(IEnumerable<IPowersheetExporterDump> dataSet, bool writeHeadings, bool writeAutoIncrement) {
             var builder = new StringBuilder();
             var rowBuilder = new StringBuilder();
 
@@ -46,6 +46,21 @@ namespace Powersheets {
             }
 
             return builder;
+        }
+
+        public StringBuilder Dump(IEnumerable<IPowersheetExporterDump> dataSet, IEnumerable<string> propertyColumns, bool writeHeadings, bool writeAutoIncrement) {
+            throw new NotImplementedException();
+        }
+
+        public StringBuilder Export(IEnumerable<object> dataSet, bool writeHeadings, bool writeAutoIncrement) {
+            if (dataSet == null || dataSet.Count() <= 0) {
+                return new StringBuilder();
+            }
+
+            object dataObj = dataSet.First();
+            IEnumerable<string> columns = FetchObjectProperties(dataObj.GetType(), null);
+
+            return Export(dataSet, columns, writeHeadings, writeAutoIncrement);
         }
 
         public StringBuilder Export(IEnumerable<object> dataSet, IEnumerable<string> columns, bool writeHeadings, bool writeAutoIncrement) {
@@ -91,17 +106,6 @@ namespace Powersheets {
                 builder.AppendLine(rowBuilder.ToString());
             }
             return builder;
-        }
-
-        public StringBuilder Export(IEnumerable<object> dataSet, bool writeHeadings, bool writeAutoIncrement) {
-            if (dataSet == null || dataSet.Count() <= 0) {
-                return new StringBuilder();
-            }
-
-            object dataObj = dataSet.First();
-            IEnumerable<string> columns = FetchObjectProperties(dataObj.GetType(), null);
-
-            return Export(dataSet, columns, writeHeadings, writeAutoIncrement);
         }
     }
 }

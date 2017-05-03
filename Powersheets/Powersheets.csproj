@@ -126,7 +126,6 @@
     <Compile Include="Models\Formula\ResultFormula.cs" />
     <Compile Include="Models\Importer\SpreadsheetImporter.cs" />
     <Compile Include="Models\PowersheetPropertyMap.cs" />
-    <Compile Include="Models\Exporter\XLSExporter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\Formula\SelectFormula.cs" />
     <Compile Include="Models\Formula\ValueFormula.cs" />
