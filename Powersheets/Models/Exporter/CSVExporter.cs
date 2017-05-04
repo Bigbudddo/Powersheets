@@ -8,7 +8,7 @@ namespace Powersheets {
     
     internal sealed class CSVExporter : Exporter, IPowersheetExporter {
 
-        public StringBuilder Dump(IEnumerable<IPowersheetDump> dataSet, bool writeHeadings, bool writeAutoIncrement) {
+        public StringBuilder PushDump(IEnumerable<IPowersheetDump> dataSet, bool writeHeadings, bool writeAutoIncrement) {
             if (dataSet == null || dataSet.Count() <= 0) {
                 return new StringBuilder();
             }
@@ -16,10 +16,10 @@ namespace Powersheets {
             object dataObj = dataSet.First();
             IEnumerable<string> columns = FetchObjectProperties(dataObj.GetType(), null);
 
-            return Dump(dataSet, columns, writeHeadings, writeAutoIncrement);
+            return PushDump(dataSet, columns, writeHeadings, writeAutoIncrement);
         }
 
-        public StringBuilder Dump(IEnumerable<IPowersheetDump> dataSet, IEnumerable<string> propertyColumns, bool writeHeadings, bool writeAutoIncrement) {
+        public StringBuilder PushDump(IEnumerable<IPowersheetDump> dataSet, IEnumerable<string> propertyColumns, bool writeHeadings, bool writeAutoIncrement) {
             var builder = new StringBuilder();
             var rowBuilder = new StringBuilder();
 

@@ -41,8 +41,42 @@ namespace Powersheets {
             return (count == 0) ? true : false;
         }
 
+        // TODO: update?
+        internal static bool IsType(this PropertyInfo property, object obj, Type type) {
+            try {
+                if (property.GetValue(obj).GetType() == type) {
+                    return true;
+                }
+                return false;
+            }
+            catch {
+                return false;
+            }
+        }
+
         internal static T CastToType<T>(this object value) {
             try {
+                // Try and get the string value first?
+                //string valueString = value.ToString();
+
+                //if (typeof(T).GetType() == typeof(decimal)) {
+                //    decimal de;
+                //}
+                //else if (typeof(T).GetType() == typeof(double)) {
+
+                //}
+                //else if (typeof(T).GetType() == typeof(int)) {
+
+                //}
+                //else if (typeof(T).GetType() == typeof(DateTime)) {
+
+                //}
+                //else if (typeof(T).GetType() == typeof(string)) {
+
+                //}
+
+
+               
                 T convertedValue = (T)Convert.ChangeType(value, typeof(T));
                 return convertedValue;
             }

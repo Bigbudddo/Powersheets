@@ -13,16 +13,16 @@ namespace Powersheets.Console {
 
         public int Id { get; set; }
 
-        [SpreadsheetColumn("Film Name")]
+        [SpreadsheetColumn("Film Name", "Name")]
         public string Name { get; set; }
 
-        [SpreadsheetColumn("Film Director")]
+        [SpreadsheetColumn("Film Director", "Director")]
         public string Director { get; set; }
 
-        [SpreadsheetColumn("Film Release Date")]
+        [SpreadsheetColumn("Film Release Date", "FilmReleaseDate")]
         public DateTime FilmReleaseDate { get; set; }
 
-        [SpreadsheetColumn("Age")]
+        [SpreadsheetColumn("Age", "AgeRating")]
         public int AgeRating { get; set; }
 
         [SpreadsheetColumn("Price")]

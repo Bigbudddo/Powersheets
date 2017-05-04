@@ -19,13 +19,15 @@ namespace Powersheets {
 
         IEnumerable<IPowersheetPropertyMap> GetMappings(params string[] propertyNames);
 
+        IEnumerable<IPowersheetPropertyMap> GetIgnoreMappings(params string[] ignoreNames);
+
         IEnumerable<T> GetAll(int tableId);
 
         IEnumerable<T> GetAll(int tableId, int headingsRowIndex);
 
         IEnumerable<T> Fetch(int tableId, int? headingsRowIndex, int? start, int? limit, params IPowersheetPropertyMap[] selectedColumns);
 
-        IEnumerable<IPowersheetDump> Extract(int tableId, int headingsRowIndex, params string[] ignoreColumns);
+        IEnumerable<T> PullDump(int tableId, int headingsRowIndex);
 
         object[,] ToGrid(int tableId);
     }

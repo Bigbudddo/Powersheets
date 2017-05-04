@@ -10,6 +10,9 @@ namespace Powersheets {
 
     public sealed class SpreadsheetImporter<T> : IPowersheetImporter<T> {
 
+        // TODO: Update Retrieve to use the HasProperty method to avoid indent of a Try-Catch
+        // TODO: Do something with the Columns Keyword!?
+
         private DataSet _data;
 
         public DataSet Data { get { return _data; } set { throw new Exception("Data is a read-only field!"); } }
@@ -54,6 +57,33 @@ namespace Powersheets {
             return retval;
         }
 
+        public IEnumerable<IPowersheetPropertyMap> GetIgnoreMappings(params string[] ignoreNames) {
+            var retval = new List<IPowersheetPropertyMap>();
+            PropertyInfo[] properties = typeof(T).GetProperties();
+
+            foreach (var property in properties) {
+                bool canAdd = false;
+                var attribute = Attribute.GetCustomAttribute(property, typeof(SpreadsheetColumn)) as SpreadsheetColumn;
+
+                if (attribute != null && ((ignoreNames == null || ignoreNames.Count() == 0) || (ignoreNames != null && !ignoreNames.Contains(property.Name)))) {
+                    canAdd = true;
+                }
+
+                if (canAdd) {
+                    foreach (string mapValue in attribute.SpreadsheetMapValues) {
+                        var map = new PowersheetPropertyMap() {
+                            PropertyName = property.Name,
+                            IsValueRequired = attribute.RequiredProperty,
+                            SpreadsheetMapValue = mapValue
+                        };
+                        retval.Add(map);
+                    }
+                }
+            }
+
+            return retval;
+        }
+
         public IEnumerable<T> GetAll(int tableId) {
             return Retrieve(tableId, null, null, null, null);
         }
@@ -66,7 +96,7 @@ namespace Powersheets {
             return Retrieve(tableId, headingsRowIndex, start, limit, selectedColumns);
         }
 
-        public IEnumerable<IPowersheetDump> Extract(int tableId, int headingsRowIndex, params string[] ignoreColumns) {
+        public IEnumerable<T> PullDump(int tableId, int headingsRowIndex) {
             // There may be a better way to execute this method, but get it working!
             if (tableId >= _data.Tables.Count) {
                 throw new Exception("Table index is out with the range of the data set");
@@ -77,54 +107,78 @@ namespace Powersheets {
             }
 
             DataTable currentTable = _data.Tables[tableId];
-            var headingsRow = new Dictionary<int, string>();
+            DataRow headingsRow = currentTable.Rows[(int)headingsRowIndex];
 
-            // Get headings row data
-            object[] headingsObjRow = currentTable.Rows[headingsRowIndex].ItemArray;
-            for (int i = 0; i < headingsObjRow.Count(); i++) {
-                object v = headingsObjRow[i];
-                try {
-                    string vString = v.ToString();
-                    if (!ignoreColumns.Contains(vString)) {
-                        headingsRow.Add(i, vString);
-                    }
-                }
-                catch {
-                    continue;
-                }
-            }
+            List<IPowersheetPropertyMap> columns = GetDumpMappings(currentTable.Rows[headingsRowIndex]).ToList();
+            int[] columnIndexes = columns.ColumnIndexes();
+            var retval = new List<T>();
 
-            var retval = new List<IPowersheetDump>();
-            for (int i = (headingsRowIndex + 1); i < currentTable.Rows.Count; i++) {
+            for (int  i = (headingsRowIndex + 1); i < currentTable.Rows.Count; i++) {
+                DataRow currentRow = currentTable.Rows[i];
+
+                // TODO: check for null columns and percentages
+
+                int propertiesMapped = 0;
                 T newObj = (T)Activator.CreateInstance(typeof(T));
 
-                var cols = new Dictionary<string, string>();
-                object[] rowData = currentTable.Rows[i].ItemArray;
-
-                foreach (var pair in headingsRow) {
-                    // Find out if the key is within rowdata, and ALSO if the property exists, if not; then put it in cols
-                    if (pair.Key < rowData.Length) {
-                        if (typeof(T).HasProperty(pair.Value)) {
-
+                foreach (var column in columns) {
+                    try {
+                        PropertyInfo p = typeof(T).GetProperty(column.PropertyName); // Could return columns
+                        // Dump Columns should not contain a formula right now!
+                        if (p.IsType(newObj, typeof(Dictionary<string, string>))) {
+                            if (!((Dictionary<string, string>)p.GetValue(newObj)).ContainsKey(column.SpreadsheetMapValue)) {
+                                int index = headingsRow.ColumnIndexOf(column.SpreadsheetMapValue);
+                                if (index >= 0) {
+                                    if (currentRow[index] != null) {
+                                        //string value = currentRow[index].CastToType<string>();
+                                        string value = currentRow[index].ToString();
+                                        if (!String.IsNullOrWhiteSpace(value)) {
+                                            ((Dictionary<string, string>)p.GetValue(newObj)).Add(column.SpreadsheetMapValue, value);
+                                            propertiesMapped++;
+                                        }
+                                    }
+                                }
+                            }
                         }
                         else {
-
+                            if (column.SpreadsheetMapValue.IsFormula()) {
+                                IPowersheetFormula formula = PowersheetFormulaFactory.Get(column.SpreadsheetMapValue);
+                                if (formula != null) {
+                                    object value = formula.Execute(ref _data, ref p, tableId, (int)headingsRowIndex, i);
+                                    if (value != null) {
+                                        if (column.PropertyName == "Columns") {
+                                            Dictionary<string, string> propertyColumns = p.GetValue(newObj) as Dictionary<string, string>;
+                                            if (propertyColumns != null && !propertyColumns.ContainsKey(column.SpreadsheetMapValue)) {
+                                                propertyColumns.Add(column.SpreadsheetMapValue, value.ToString());
+                                                p.SetValue("Columns", propertyColumns, null);
+                                            }
+                                        }
+                                        else {
+                                            p.SetValue(newObj, value, null);
+                                            propertiesMapped++;
+                                        }
+                                    }
+                                }
+                            }
+                            else {
+                                int index = headingsRow.ColumnIndexOf(column.SpreadsheetMapValue);
+                                if (index >= 0) {
+                                    object value = currentRow[index].CastToPropertyType(p);
+                                    if (value != null) {
+                                        p.SetValue(newObj, value, null);
+                                        propertiesMapped++;
+                                    }
+                                }
+                            }
                         }
                     }
-
-
-                    if (pair.Key < rowData.Length) {
-                        object rowObject = rowData[pair.Key];
-                        if (rowObject != null) {
-                            try {
-                                string rowString = rowObject.ToString();
-                            }
-                            catch {
-                                continue;
-                            }
-                        }
+                    catch {
+                        continue;
                     }
                 }
+
+                // TODO: validate?
+                retval.Add(newObj);
             }
 
             return retval;
@@ -200,7 +254,53 @@ namespace Powersheets {
 
             return -1;
         }
- 
+
+        private IEnumerable<IPowersheetPropertyMap> GetDumpMappings(DataRow headingsRow) {
+            var retval = new List<IPowersheetPropertyMap>();
+            PropertyInfo[] properties = typeof(T).GetProperties();
+
+            foreach (var obj in headingsRow.ItemArray.ToArray()) {
+                string objString = obj.ToString(); // Most things have a toString method, maybe update later though?
+                bool found = false;
+                bool foundIsValueRequried = false;
+                string foundPropertyName = string.Empty;
+
+                foreach (var property in properties) {
+                    if (found) break;
+                    var attribute = Attribute.GetCustomAttribute(property, typeof(SpreadsheetColumn)) as SpreadsheetColumn;
+                    if (attribute != null) {
+                        foreach (var column in attribute.SpreadsheetMapValues) {
+                            if (found) break;
+                            if (column == objString) {
+                                found = true;
+                                foundIsValueRequried = attribute.RequiredProperty;
+                                foundPropertyName = property.Name;
+                            }
+                        }
+                    }
+                }
+
+                if (found && !String.IsNullOrWhiteSpace(foundPropertyName)) {
+                    var propMap = new PowersheetPropertyMap() {
+                        PropertyName = foundPropertyName,
+                        IsValueRequired = foundIsValueRequried,
+                        SpreadsheetMapValue = objString
+                    };
+                    retval.Add(propMap);
+                }
+                else {
+                    var colMap = new PowersheetPropertyMap() {
+                        PropertyName = "Columns",
+                        IsValueRequired = false,
+                        SpreadsheetMapValue = objString
+                    };
+                    retval.Add(colMap);
+                }
+            }
+
+            return retval;
+        }
+
         private IEnumerable<T> Retrieve(int tableId, int? headingsRowIndex, int? start, int? limit, params IPowersheetPropertyMap[] selectedColumns) {
             // Validate our table index
             if (tableId >= _data.Tables.Count) {

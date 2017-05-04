@@ -20,6 +20,9 @@ namespace Powersheets.Console {
                 System.Console.WriteLine("-----------------");
 
                 switch (input.ToUpper()) {
+                    case "-2":
+                        TestDump2();
+                        break;
                     case "-1":
                         TestDump();
                         break;
@@ -141,10 +144,20 @@ namespace Powersheets.Console {
             }
 
             IPowersheetExporter exporter = PowersheetExportFactory.Get();
-            StringBuilder dump = exporter.Dump(data, true, false);
+            StringBuilder dump = exporter.PushDump(data, true, false);
 
             using (StreamWriter writer = new StreamWriter(@"dump.csv")) {
                 writer.WriteLine(dump.ToString());
+            }
+        }
+
+        // Bad names, I know.
+        static void TestDump2() {
+            IPowersheetImporter<Movie> importer = PowersheetImportFactory.Get<Movie>(@"dump.xlsx");
+            List<Movie> data = importer.PullDump(0, 0).ToList();
+
+            foreach (var d in data) {
+                System.Console.WriteLine(String.Format("{0} Columns Count: {1}", d.Name, d.Columns.Count));
             }
         }
     }
