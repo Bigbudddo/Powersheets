@@ -143,7 +143,7 @@ namespace Powersheets.Console {
                 d.Columns.Add("test", "this is dumped!");
             }
 
-            IPowersheetExporter exporter = PowersheetExportFactory.Get();
+            IPowersheetExporter exporter = PowersheetExportFactory.Get(PowersheetExportFactory.ExportType.CSV);
             StringBuilder dump = exporter.PushDump(data, true, false);
 
             using (StreamWriter writer = new StreamWriter(@"dump.csv")) {

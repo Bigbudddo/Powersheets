@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="Attributes\SpreadsheetAutoIncrement.cs" />
     <Compile Include="Attributes\SpreadsheetColumn.cs" />
+    <Compile Include="Attributes\SpreadsheetWorksheet.cs" />
     <Compile Include="Factories\PowersheetExportFactory.cs" />
     <Compile Include="Factories\PowersheetImportFactory.cs" />
     <Compile Include="Framework\Core\BinaryFormat\Enums.cs" />
@@ -115,6 +116,7 @@
     <Compile Include="Interfaces\IPowersheetImporter.cs" />
     <Compile Include="Interfaces\IPowersheetPropertyMap.cs" />
     <Compile Include="Models\Exporter\Exporter.cs" />
+    <Compile Include="Models\Exporter\XLSExporter.cs" />
     <Compile Include="Models\Formula\CastFormula.cs" />
     <Compile Include="Factories\PowersheetFormulaFactory.cs" />
     <Compile Include="Helpers\Constants.cs" />

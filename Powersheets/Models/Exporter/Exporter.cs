@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Powersheets {
 
-    internal abstract class Exporter {
+    public abstract class Exporter {
 
         protected IEnumerable<string> FetchObjectProperties(Type objType, IEnumerable<string> columns) {
             var retval = new List<string>();

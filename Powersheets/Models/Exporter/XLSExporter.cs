@@ -1,108 +1,205 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Powersheets {
-    
-    // TODO: Fix this to work with how the CSV work and DUMP'ing
-    internal sealed class XLSExporter : Exporter, IPowersheetExporter {
 
-        public StringBuilder Dump(IEnumerable<IPowersheetExporterDump> dataSet, bool writeHeadings) {
-            var rowData = new StringBuilder();
-            var colData = new StringBuilder();
+    public sealed class XLSExporter : Exporter, IPowersheetExporter {
 
-            if (dataSet == null || dataSet.Count() <= 0) {
-                return new StringBuilder();
+        private string XLSHeading {
+            get {
+                var sb = new StringBuilder();
+
+                sb.Append("<?xml version=\"1.0\"?>\n");
+                sb.Append("<?mso-application progid=\"Excel.Sheet\"?>\n");
+                sb.Append("<Workbook xmlns=\"urn:schemas-microsoft-com:office:spreadsheet\" ");
+                sb.Append("xmlns:o=\"urn:schemas-microsoft-com:office:office\" ");
+                sb.Append("xmlns:x=\"urn:schemas-microsoft-com:office:excel\" ");
+                sb.Append("xmlns:ss=\"urn:schemas-microsoft-com:office:spreadsheet\" ");
+                sb.Append("xmlns:html=\"http://www.w3.org/TR/REC-html40\">\n");
+                sb.Append("<DocumentProperties xmlns=\"urn:schemas-microsoft-com:office:office\">");
+                sb.Append("<Author>Stuart Harrison</Author>");
+                sb.Append("</DocumentProperties>");
+                sb.Append("<ExcelWorkbook xmlns=\"urn:schemas-microsoft-com:office:excel\">\n");
+                sb.Append("<ProtectStructure>False</ProtectStructure>\n");
+                sb.Append("<ProtectWindows>False</ProtectWindows>\n");
+                sb.Append("</ExcelWorkbook>\n");
+
+                return sb.ToString();
             }
-
-            throw new NotImplementedException();
         }
 
-        public StringBuilder Export(IEnumerable<object> dataSet, IEnumerable<string> columns, bool writeHeadings, bool writeAutoIncrement) {
-            var rowData = new StringBuilder();
-            var colData = new StringBuilder();
+        private string XLSStyles {
+            get {
+                var sb = new StringBuilder();
 
-            if (dataSet == null || dataSet.Count() <= 0) {
-                return new StringBuilder();
+                sb.Append("<Styles>\n");
+                sb.Append("<Style ss:ID=\"Default\" ss:Name=\"Normal\">\n");
+                sb.Append("<Alignment ss:Vertical=\"Bottom\"/>\n");
+                sb.Append("<Borders/>\n");
+                sb.Append("<Font/>\n");
+                sb.Append("<Interior/>\n");
+                sb.Append("<NumberFormat/>\n");
+                sb.Append("<Protection/>\n");
+                sb.Append("</Style>\n");
+                sb.Append("<Style ss:ID=\"s27\" ss:Name=\"Hyperlink\">\n");
+                sb.Append("<Font ss:Color=\"#0000FF\" ss:Underline=\"Single\"/>\n");
+                sb.Append("</Style>\n");
+                sb.Append("<Style ss:ID=\"s24\">\n");
+                sb.Append("<Font x:Family=\"Swiss\" ss:Bold=\"1\"/>\n");
+                sb.Append("</Style>\n");
+                sb.Append("<Style ss:ID=\"s25\">\n");
+                sb.Append("<Font x:Family=\"Swiss\" ss:Italic=\"1\"/>\n");
+                sb.Append("</Style>\n");
+                sb.Append("<Style ss:ID=\"s26\">\n");
+                sb.Append("<Alignment ss:Horizontal=\"Center\" ss:Vertical=\"Bottom\"/>\n");
+                sb.Append("</Style>\n");
+                sb.Append("</Styles>\n");
+
+                return sb.ToString();
             }
+        }
 
-            List<string> columnCollection = new List<string>();
-            if (writeAutoIncrement) {
-                var attribute = Attribute.GetCustomAttribute(dataSet.First().GetType(), typeof(SpreadsheetAutoIncrement)) as SpreadsheetAutoIncrement;
-                if (attribute != null) {
-                    columnCollection.Add(attribute.PropertyName);
-                }
+        private string XLSOptions {
+            get {
+                // This is Required Only Once ,	But this has to go after the First Worksheet's First Table	
+                var sb = new StringBuilder();
+                sb.Append("\n<WorksheetOptions xmlns=\"urn:schemas-microsoft-com:office:excel\">\n<Selected/>\n </WorksheetOptions>\n");
+                return sb.ToString();
             }
-            columnCollection.AddRange(columns);
-
-            rowData.Append("<Row ss:StyleID=\"s62\">");
-            foreach (var s in columnCollection) {
-                if (dataSet.First().GetType().GetProperty(s).GetType() == typeof(DateTime)) {
-                    colData.Append("<Column ss:AutoFitWidth=\"1\" ss:Width=\"100\"/>");
-                }
-                else {
-                    colData.Append("<Column ss:AutoFitWidth=\"1\" />");
-                }
-                if (writeHeadings) {
-                    rowData.Append(String.Format("<Cell><Data ss:Type=\"String\" x:AutoFilter=\"All\">{0}</Data></Cell>", s));
-                }
-            }
-            rowData.Append("</Row>");
-
-            foreach (var data in dataSet) {
-                rowData.Append("<Row>");
-                foreach (string s in columnCollection) {
-                    var propValue = data.GetType().GetProperty(s).GetValue(data, null);
-                    string value = propValue.ToStringValue();
-                    rowData.Append(String.Format("<Cell><Data ss:Type=\"String\">{0}</Data></Cell>", value));
-                }
-                rowData.Append("</Row>");
-            }
-
-            var dateHer = String.Format("export-{0}", DateTime.Now.ToShortDateString());
-            StringBuilder retval = new StringBuilder(String.Format(
-                @"<Worksheet ss:Name=""{0}"">
-                    <Table ss:ExpandedColumnCount=""{1}"" ss:ExpandedRowCount=""{2}"" x:FullColumns=""1"" x:FullRows=""1"" ss:DefaultRowHeight=""15"">
-                        {3}
-                        {4}
-                    </Table>
-                    <WorksheetOptions xmlns=""urn:schemas-microsoft-com:office:excel"">
-                        <PageSetup>
-                            <Header x:Margin=""0.3""/>
-                            <Footer x:Margin=""0.3""/>
-                            <PageMargins x:Bottom=""0.75"" x:Left=""0.7"" x:Right=""0.7"" x:Top=""0.75""/>
-                        </PageSetup>
-                        <Print>
-                            <ValidPrinterInfo/>
-                            <HorizontalResolution>300</HorizontalResolution>
-                            <VerticalResolution>300</VerticalResolution>
-                        </Print>
-                        <Selected/>
-                        <Panes>
-                            <Pane>
-                                <Number>3</Number>
-                                <ActiveCol>2</ActiveCol>
-                            </Pane>
-                        </Panes>
-                        <ProtectObjects>False</ProtectObjects>
-                        <ProtectScenarios>False</ProtectScenarios>
-                    </WorksheetOptions>
-                </Worksheet>", dateHer, columnCollection.Count() + 1, dataSet.Count() + 1, colData, rowData
-            ));
-            return retval;
         }
 
         public StringBuilder Export(IEnumerable<object> dataSet, bool writeHeadings, bool writeAutoIncrement) {
             if (dataSet == null || dataSet.Count() <= 0) {
-                return new StringBuilder();
+                throw new Exception("Dataset cannot be null/or empty");
             }
 
-            object dataObj = dataSet.First();
-            IEnumerable<string> columns = FetchObjectProperties(dataObj.GetType(), null);
+            var type = dataSet.ToList().GetType().GetTypeInfo().GenericTypeArguments[0];
+            IEnumerable<string> columns = FetchObjectProperties(type, null);
 
             return Export(dataSet, columns, writeHeadings, writeAutoIncrement);
+        }
+
+        public StringBuilder Export(IEnumerable<object> dataSet, IEnumerable<string> columns, bool writeHeadings, bool writeAutoIncrement) {
+            var sb = new StringBuilder();
+
+            if (dataSet == null || dataSet.Count() <= 0) {
+                throw new Exception("Dataset cannot be null/or empty");
+            }
+
+            string title = "Sheet 1";
+
+            var type = dataSet.ToList().GetType().GetTypeInfo().GenericTypeArguments[0];
+            var attribute = Attribute.GetCustomAttribute(type, typeof(SpreadsheetWorksheet)) as SpreadsheetWorksheet;
+            if (attribute != null) {
+                title = attribute.WorksheetTitle;
+            }
+
+            sb.Append(this.XLSHeading);
+            sb.Append(this.XLSStyles);
+            sb.Append(this.GenerateWorksheet(dataSet, columns, title, writeHeadings, writeAutoIncrement).ToString());
+            sb.Append(this.XLSOptions);
+            sb.Append("</Workbook>\n");
+
+            return sb.ConvertHtmlToXLS();
+        }
+
+        public StringBuilder ExportMultiple(IEnumerable<string> workbookNames, bool writeHeadings, bool writeAutoIncrement, params IEnumerable<object>[] workbooks) {
+            var sb = new StringBuilder();
+
+            if (workbooks == null || workbooks.Count() <= 0) {
+                throw new Exception("Dataset(s) cannot be null/or empty");
+            }
+
+            if (workbookNames.Count() != workbooks.Count()) {
+                throw new Exception("Workbook names does not have the same length as the data!");
+            }
+
+            sb.Append(this.XLSHeading);
+            sb.Append(this.XLSStyles);
+            sb.Append(this.GenerateWorksheet(workbooks.First(), null, workbookNames.First(), writeHeadings, writeAutoIncrement).ToString());
+            sb.Append(this.XLSOptions);
+
+            for (int i = 1; i < workbooks.Count(); i++) {
+                sb.Append(this.GenerateWorksheet(workbooks[i], null, workbookNames.ToList()[i], writeHeadings, writeAutoIncrement).ToString());
+            }
+
+            sb.Append("</Workbook>\n");
+
+            return sb.ConvertHtmlToXLS();
+        }
+
+        public StringBuilder PushDump(IEnumerable<IPowersheetDump> dataSet, bool writeHeadings, bool writeAutoIncrement) {
+            throw new NotImplementedException();
+        }
+
+        public StringBuilder PushDump(IEnumerable<IPowersheetDump> dataSet, IEnumerable<string> propertyColumns, bool writeHeadings, bool writeAutoIncrement) {
+            throw new NotImplementedException();
+        }
+
+        private StringBuilder GenerateWorksheet(IEnumerable<object> data, IEnumerable<string> propertyColumns, string title, bool writeHeadings, bool writeAutoIncrement) {
+            var sb = new StringBuilder();
+            var dataList = data.ToList();
+
+            var type = dataList.GetType().GetTypeInfo().GenericTypeArguments[0];
+            List<string> columnCollection = new List<string>();
+
+            if (writeHeadings) {
+                var attribute = Attribute.GetCustomAttribute(type, typeof(SpreadsheetAutoIncrement)) as SpreadsheetAutoIncrement;
+                if (attribute != null) {
+                    columnCollection.Add(attribute.PropertyName);
+                }
+            }
+
+            if (propertyColumns == null || propertyColumns.Count() <= 0) {
+                columnCollection.AddRange(FetchObjectProperties(type, null));
+            }
+            else {
+                columnCollection.AddRange(propertyColumns);
+            }
+            
+
+            sb.Append("<Worksheet ss:Name=\"" + title + "\">");
+            sb.Append("<Table>");
+
+            if (writeHeadings) {
+                sb.Append("<tr>");
+                foreach (var i in columnCollection) {
+                    sb.Append("<th>");
+                    sb.Append(i);
+                    sb.Append("</th>");
+                }
+                sb.Append("</tr>");
+            }
+
+            for (int r = 0; r < data.Count(); r++) {
+                // foreach row in the data
+                var item = dataList[r];
+                sb.Append("<tr>");
+
+                foreach (var c in columnCollection) {
+                    sb.Append("<td>");
+                    try {
+                        var propValue = item.GetType().GetProperty(c).GetValue(item, null);
+                        string value = propValue.ToStringValue();
+
+                        sb.Append(value);
+                    }
+                    catch {
+
+                    }
+                    sb.Append("</td>");
+                }
+
+                sb.Append("</tr>");
+            }
+
+            sb.Append("</Table>");
+            sb.Append("</Worksheet>");
+            return sb;
         }
     }
 }

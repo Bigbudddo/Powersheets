@@ -230,6 +230,18 @@ namespace Powersheets {
             }
         }
 
+        internal static StringBuilder ConvertHtmlToXLS(this StringBuilder sb) {
+            sb = sb.Replace("<tr>", "<Row ss:AutoFitHeight=\"1\" >\n");
+            sb = sb.Replace("</tr>", "</Row>\n");
+
+            sb = sb.Replace("<th>", "<Cell ss:StyleID=\"s24\"><Data ss:Type=\"String\">");
+            sb = sb.Replace("</th>", "</Data></Cell>\n");
+
+            sb = sb.Replace("<td>", "<Cell><Data ss:Type=\"String\">");
+            sb = sb.Replace("</td>", "</Data></Cell>\n");
+            return sb;
+        }
+
         internal static int[] ColumnIndexes(this IEnumerable<IPowersheetPropertyMap> value) {
             var indexes = new List<int>();
 
