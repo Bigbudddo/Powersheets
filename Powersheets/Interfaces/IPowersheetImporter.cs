@@ -31,4 +31,17 @@ namespace Powersheets {
 
         object[,] ToGrid(int tableId);
     }
+
+    public interface IPowersheetImporter {
+
+        DataSet Data { get; set; }
+
+        object[,] ToGrid(int tableId);
+
+        Dictionary<int, string> TableInfo();
+
+        IEnumerable<object[,]> DumpSpreadsheet();
+
+        IEnumerable<Tuple<string, object[,]>> DumpSpreadsheetData();
+    }
 }

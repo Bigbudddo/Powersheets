@@ -389,4 +389,69 @@ namespace Powersheets {
             return retval;
         }
     }
+
+    public sealed class SpreadsheetImporter : IPowersheetImporter {
+
+        private DataSet _data;
+
+        public DataSet Data { get { return _data; } set { throw new Exception("Data is a read-only field!"); } }
+
+        public SpreadsheetImporter(DataSet data) {
+            _data = data;
+        }
+
+        public object[,] ToGrid(int tableId) {
+            if (tableId >= _data.Tables.Count) {
+                throw new Exception("Table index is out with the range of the data set");
+            }
+
+            int width = _data.Tables[tableId].MaxWidth();
+            int height = _data.Tables[tableId].Rows.Count;
+            // [y,x]
+            var retval = new object[height, width];
+
+            for (int o = 0; o < _data.Tables[tableId].Rows.Count; o++) {
+                object[] row = _data.Tables[tableId].Rows[o].ItemArray;
+                for (int i = 0; i < row.Count(); i++) {
+                    retval[o, i] = row[i];
+                }
+            }
+
+            return retval;
+        }
+
+        public Dictionary<int, string> TableInfo() {
+            var retval = new Dictionary<int, string>();
+
+            for (int i = 0; i < _data.Tables.Count; i++) {
+                retval.Add(i, _data.Tables[i].ToString());
+            }
+
+            return retval;
+        }
+
+        public IEnumerable<object[,]> DumpSpreadsheet() {
+            var retval = new List<object[,]>();
+
+            for (int i = 0; i < _data.Tables.Count; i++) {
+                object[,] x = this.ToGrid(i);
+                retval.Add(x);
+            }
+
+            return retval;
+        }
+
+        public IEnumerable<Tuple<string, object[,]>> DumpSpreadsheetData() {
+            var retval = new List<Tuple<string, object[,]>>();
+
+            for (int i = 0; i < _data.Tables.Count; i++) {
+                string tableName = _data.Tables[i].ToString();
+                object[,] x = this.ToGrid(i);
+
+                retval.Add(new Tuple<string, object[,]>(tableName, x));
+            }
+
+            return retval;
+        }
+    }
 }
