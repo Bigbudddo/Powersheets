@@ -112,6 +112,13 @@ namespace Powersheets {
                     if (DateTime.TryParse(valueString, out dt)) {
                         return dt;
                     }
+                    else if (valueString.Length == 8) {
+                        // TODO: tidy code, etc...
+                        //20170905 format example?
+                        char[] v = valueString.ToCharArray();
+                        var s = string.Format("{0}{1}{2}{3}-{4}{5}-{6}{7}", v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7]);
+                        return DateTime.Parse(s);
+                    }
                     else {
                         double dut;
                         if (double.TryParse(valueString, out dut)) {
