@@ -4,7 +4,7 @@ using System.Data;
 using System.IO;
 using System.Text;
 using Excel.Core;
-using Excel.Log;
+using ExcelDataReader.Log;
 using ExcelDataReader.Portable.Core;
 using ExcelDataReader.Portable.Core.BinaryFormat;
 

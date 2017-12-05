@@ -109,7 +109,7 @@
     <Compile Include="Framework\IExcelDataReader.cs" />
     <Compile Include="Framework\Log\ILog.cs" />
     <Compile Include="Framework\Log\Log.cs" />
-    <Compile Include="Framework\Log\Logger\NullLog.cs" />
+    <Compile Include="Framework\Log\Logger\NullLogFactory.cs" />
     <Compile Include="Framework\Log\LogManager.cs" />
     <Compile Include="Interfaces\IPowersheetExporter.cs" />
     <Compile Include="Interfaces\IPowersheetDump.cs" />

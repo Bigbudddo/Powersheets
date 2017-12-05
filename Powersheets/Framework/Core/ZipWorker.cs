@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.IO;
-using Excel.Log;
+using Excel;
+using ExcelDataReader.Log;
 using ICSharpCode.SharpZipLib.Zip;
 using System.Collections;
+using System.IO;
 
 namespace Excel.Core
 {
